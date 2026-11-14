@@ -1,9 +1,18 @@
+
 import './styles/main.css'
 
 document.querySelector('#app').innerHTML = `
   <header class="header">
-    <button class="menu-button" id="menuButton" aria-label="Buka menu">
-      ☰
+    <button
+      class="menu-button"
+      id="menuButton"
+      aria-label="Buka menu"
+      aria-controls="sidebar"
+      aria-expanded="false"
+    >
+      <span></span>
+      <span></span>
+      <span></span>
     </button>
 
     <a href="#" class="logo">aruhetta<span>.</span></a>
@@ -12,6 +21,44 @@ document.querySelector('#app').innerHTML = `
       ♙
     </button>
   </header>
+
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <aside
+    class="sidebar"
+    id="sidebar"
+    aria-hidden="true"
+    inert
+  >
+    <div class="sidebar-header">
+      <a href="#" class="logo">aruhetta<span>.</span></a>
+      <button class="sidebar-close" id="sidebarClose" aria-label="Tutup menu">
+        ×
+      </button>
+    </div>
+
+    <p class="sidebar-label">MAIN MENU</p>
+
+    <nav class="sidebar-nav" aria-label="Navigasi utama">
+      <a href="#" class="sidebar-link active">
+        <span>⌂</span> Home
+      </a>
+      <a href="#about" class="sidebar-link">
+        <span>◈</span> About
+      </a>
+      <a href="#arumunity" class="sidebar-link">
+        <span>◎</span> Arumunity
+      </a>
+      <a href="#tools" class="sidebar-link">
+        <span>⌘</span> Tools
+      </a>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <p>Explore, Create, and Connect.</p>
+      <small>© ${new Date().getFullYear()} Aruhetta</small>
+    </div>
+  </aside>
 
   <main>
     <section class="hero">
@@ -43,26 +90,26 @@ document.querySelector('#app').innerHTML = `
       </p>
     </section>
 
-    <section class="features">
+    <section class="features" id="about">
       <article class="feature-card">
         <span>01</span>
         <h3>About</h3>
         <p>Get to know more about Aruhetta.</p>
-        <a href="#">Explore →</a>
+        <a href="#about">Explore →</a>
       </article>
 
-      <article class="feature-card">
+      <article class="feature-card" id="arumunity">
         <span>02</span>
         <h3>Arumunity</h3>
         <p>Discover a place to connect and share.</p>
-        <a href="#">Explore →</a>
+        <a href="#arumunity">Explore →</a>
       </article>
 
-      <article class="feature-card">
+      <article class="feature-card" id="tools">
         <span>03</span>
         <h3>Tools</h3>
         <p>Find useful tools for your daily needs.</p>
-        <a href="#">Explore →</a>
+        <a href="#tools">Explore →</a>
       </article>
     </section>
 
@@ -84,7 +131,64 @@ document.querySelector('#app').innerHTML = `
 `
 
 const menuButton = document.querySelector('#menuButton')
+const sidebar = document.querySelector('#sidebar')
+const sidebarBackdrop = document.querySelector('#sidebarBackdrop')
+const sidebarClose = document.querySelector('#sidebarClose')
+const sidebarLinks = document.querySelectorAll('.sidebar-link')
+
+function openSidebar() {
+  sidebar.classList.add('is-open')
+  sidebarBackdrop.classList.add('is-visible')
+  menuButton.classList.add('active')
+
+  menuButton.setAttribute('aria-expanded', 'true')
+  sidebar.setAttribute('aria-hidden', 'false')
+  sidebar.inert = false
+
+  document.body.classList.add('sidebar-open')
+  sidebarClose.focus()
+}
+
+function closeSidebar() {
+  sidebar.classList.remove('is-open')
+  sidebarBackdrop.classList.remove('is-visible')
+  menuButton.classList.remove('active')
+
+  menuButton.setAttribute('aria-expanded', 'false')
+  sidebar.setAttribute('aria-hidden', 'true')
+  sidebar.inert = true
+
+  document.body.classList.remove('sidebar-open')
+  menuButton.focus()
+}
 
 menuButton.addEventListener('click', () => {
-  menuButton.classList.toggle('active')
+  if (sidebar.classList.contains('is-open')) {
+    closeSidebar()
+  } else {
+    openSidebar()
+  }
+})
+
+sidebarClose.addEventListener('click', closeSidebar)
+sidebarBackdrop.addEventListener('click', closeSidebar)
+
+document.addEventListener('keydown', (event) => {
+  if (
+    event.key === 'Escape' &&
+    sidebar.classList.contains('is-open')
+  ) {
+    closeSidebar()
+  }
+})
+
+sidebarLinks.forEach((link) => {
+  link.addEventListener('click', () => {
+    sidebarLinks.forEach((item) => {
+      item.classList.remove('active')
+    })
+
+    link.classList.add('active')
+    closeSidebar()
+  })
 })
